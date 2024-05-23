@@ -17,14 +17,17 @@ interface Props {
 }
 
 export function UpgradePage({ navModel }: Props) {
+  const styles = useStyles2(getStyles);
   return (
     <Page navModel={navModel}>
       <Page.Contents>
         <ServerStats />
-        <UpgradeInfo
-          editionNotice="You are running the open-source version of Grafana.
-        You have to install the Enterprise edition in order enable Enterprise features."
-        />
+        <div className={styles.title}>
+          <UpgradeInfo
+            editionNotice="You are running the open-source version of Grafana.
+          You have to install the Enterprise edition in order enable Enterprise features."
+          />
+        </div>
       </Page.Contents>
     </Page>
   );
