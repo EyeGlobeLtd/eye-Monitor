@@ -55,7 +55,7 @@ export const UpgradeInfo = ({ editionNotice }: UpgradeInfoProps) => {
 const getStyles = (theme: GrafanaTheme2) => {
   return {
     column: css`
-      display: grid;
+      display: none;
       grid-template-columns: 100%;
       column-gap: 20px;
       row-gap: 40px;
@@ -66,6 +66,7 @@ const getStyles = (theme: GrafanaTheme2) => {
     `,
     title: css`
       margin: ${theme.spacing(4)} 0;
+      display: none;
     `,
   };
 };
