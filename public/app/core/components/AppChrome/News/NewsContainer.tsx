@@ -59,7 +59,7 @@ export function NewsContainer({ className }: NewsContainerProps) {
 const getStyles = (theme: GrafanaTheme2) => {
   return {
     title: css({
-      display: `flex`,
+      display: `none`,
       alignItems: `center`,
       justifyContent: `center`,
       gap: theme.spacing(2),
