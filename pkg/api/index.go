@@ -128,7 +128,7 @@ func (hs *HTTPServer) setIndexViewData(c *contextmodel.ReqContext) (*dtos.IndexV
 		AppName:                             setting.ApplicationName,
 		AppNameBodyClass:                    "app-grafana",
 		FavIcon:                             "public/img/egg.png",
-		AppleTouchIcon:                      "public/img/apple-touch-icon.png",
+		AppleTouchIcon:                      "public/img/egg.png",
 		AppTitle:                            "eyeMonitor",
 		NavTree:                             navTree,
 		Nonce:                               c.RequestNonce,
