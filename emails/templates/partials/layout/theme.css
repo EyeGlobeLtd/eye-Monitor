@@ -34,3 +34,7 @@
 
   padding: 10px 25px;
 }
+
+.header {
+  display: none;
+}

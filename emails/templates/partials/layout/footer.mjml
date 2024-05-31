@@ -1,5 +1,5 @@
 <mj-column background-color="transparent">
   <mj-text align="center">
-    &copy; {{ now | date "2006" }} Grafana Labs. Sent by <a href="{{ .AppUrl }}">Grafana v{{ .BuildVersion }}</a>.
+    &copy; {{ now | date "2006" }} EyeGlobe. Sent by eyeMonitor v{{ .BuildVersion }}.
   </mj-text>
 </mj-column>

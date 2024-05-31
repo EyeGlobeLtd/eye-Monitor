@@ -13,7 +13,7 @@
     <mj-include path="./partials/alerting/summary.mjml" />
   </mj-head>
   <mj-body>
-    <mj-section>
+    <mj-section css-class="header">
       <mj-include path="./partials/layout/header.mjml" />
     </mj-section>
 
