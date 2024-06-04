@@ -102,7 +102,7 @@ export const Footer = React.memo(({ customLinks, hideEdition }: Props) => {
   const links = (customLinks || getFooterLinks()).concat(getVersionLinks(hideEdition));
 
   return (
-    <footer className="footer">
+    <footer className="footer" hidden>
       <div className="text-center">
         <ul>
           {links.map((link, index) => (
