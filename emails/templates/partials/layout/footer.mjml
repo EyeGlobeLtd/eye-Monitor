@@ -1,5 +1,5 @@
 <mj-column background-color="transparent">
   <mj-text align="center">
-    &copy; {{ now | date "2006" }} EyeGlobe. Sent by eyeMonitor v{{ .BuildVersion }}.
+    &copy; {{ now | date "2006" }} EyeGlobe. Sent by eyeMonitor.
   </mj-text>
 </mj-column>
