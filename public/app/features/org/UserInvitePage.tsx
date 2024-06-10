@@ -8,7 +8,7 @@ import UserInviteForm from './UserInviteForm';
 export function UserInvitePage() {
   const subTitle = (
     <>
-      Send invitation or add existing Grafana user to the organization.
+      Send invitation or add existing eyeMonitor user to the organization.
       <span className="highlight-word"> {contextSrv.user.orgName}</span>
     </>
   );
