@@ -27,7 +27,7 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 		configNodes = append(configNodes, &navtree.NavLink{
 			Text:     "Plugins",
 			Id:       "plugins",
-			SubTitle: "Extend the Grafana experience with plugins",
+			SubTitle: "Extend the eyeMonitor experience with plugins",
 			Icon:     "plug",
 			Url:      s.cfg.AppSubURL + "/plugins",
 		})
@@ -35,7 +35,7 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 
 	if hasAccess(ac.EvalAny(ac.EvalPermission(ac.ActionOrgUsersRead), ac.EvalPermission(ac.ActionUsersRead, ac.ScopeGlobalUsersAll))) {
 		configNodes = append(configNodes, &navtree.NavLink{
-			Text: "Users", SubTitle: "Manage users in Grafana", Id: "global-users", Url: s.cfg.AppSubURL + "/admin/users", Icon: "user",
+			Text: "Users", SubTitle: "Manage users in eyeMonitor", Id: "global-users", Url: s.cfg.AppSubURL + "/admin/users", Icon: "user",
 		})
 	}
 
@@ -53,7 +53,7 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 		configNodes = append(configNodes, &navtree.NavLink{
 			Text:     "Service accounts",
 			Id:       "serviceaccounts",
-			SubTitle: "Use service accounts to run automated workloads in Grafana",
+			SubTitle: "Use service accounts to run automated workloads in eyeMonitor",
 			Icon:     "gf-service-account",
 			Url:      s.cfg.AppSubURL + "/org/serviceaccounts",
 		})
@@ -67,7 +67,7 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 		configNodes = append(configNodes, &navtree.NavLink{
 			Text:     "API keys",
 			Id:       "apikeys",
-			SubTitle: "Manage and create API keys that are used to interact with Grafana HTTP APIs",
+			SubTitle: "Manage and create API keys that are used to interact with eyeMonitor HTTP APIs",
 			Icon:     "key-skeleton-alt",
 			Url:      s.cfg.AppSubURL + "/org/apikeys",
 		})
@@ -96,13 +96,13 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 
 	if hasAccess(ac.EvalPermission(ac.ActionSettingsRead, ac.ScopeSettingsAll)) {
 		configNodes = append(configNodes, &navtree.NavLink{
-			Text: "Settings", SubTitle: "View the settings defined in your Grafana config", Id: "server-settings", Url: s.cfg.AppSubURL + "/admin/settings", Icon: "sliders-v-alt",
+			Text: "Settings", SubTitle: "View the settings defined in your eyeMonitor config", Id: "server-settings", Url: s.cfg.AppSubURL + "/admin/settings", Icon: "sliders-v-alt",
 		})
 	}
 
 	if hasGlobalAccess(orgsAccessEvaluator) {
 		configNodes = append(configNodes, &navtree.NavLink{
-			Text: "Organizations", SubTitle: "Isolated instances of Grafana running on the same server", Id: "global-orgs", Url: s.cfg.AppSubURL + "/admin/orgs", Icon: "building",
+			Text: "Organizations", SubTitle: "Isolated instances of eyeMonitor running on the same server", Id: "global-orgs", Url: s.cfg.AppSubURL + "/admin/orgs", Icon: "building",
 		})
 	}
 
