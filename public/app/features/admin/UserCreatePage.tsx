@@ -20,7 +20,7 @@ const pageNav: NavModelItem = {
   icon: 'user',
   id: 'user-new',
   text: 'New user',
-  subTitle: 'Create a new Grafana user.',
+  subTitle: 'Create a new eyeMonitor user.',
 };
 
 const UserCreatePage = () => {
