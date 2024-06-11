@@ -15,8 +15,8 @@ function AdminSettings() {
     <Page navId="server-settings">
       <Page.Contents>
         <div className="grafana-info-box span8" style={{ margin: '20px 0 25px 0' }}>
-          These system settings are defined in grafana.ini or custom.ini (or overridden in ENV variables). To change
-          these you currently need to restart Grafana.
+          These system settings are defined in custom.ini (or overridden in ENV variables). To change
+          these you currently need to restart eyeMonitor.
         </div>
 
         {loading && <AdminSettingsTable.Skeleton />}
