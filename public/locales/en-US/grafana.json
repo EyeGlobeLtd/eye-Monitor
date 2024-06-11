@@ -1130,7 +1130,7 @@
       "title": "Search dashboards"
     },
     "server-settings": {
-      "subtitle": "View the settings defined in your Grafana config",
+      "subtitle": "View the settings defined in your eyeMonitor config",
       "title": "Settings"
     },
     "service-accounts": {
