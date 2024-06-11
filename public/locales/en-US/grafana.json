@@ -1014,11 +1014,11 @@
       "title": "Frontend"
     },
     "global-orgs": {
-      "subtitle": "Isolated instances of Grafana running on the same server",
+      "subtitle": "Isolated instances of eyeMonitor running on the same server",
       "title": "Organizations"
     },
     "global-users": {
-      "subtitle": "Manage users in Grafana",
+      "subtitle": "Manage users in eyeMonitor",
       "title": "Users"
     },
     "grafana-quaderno": {
