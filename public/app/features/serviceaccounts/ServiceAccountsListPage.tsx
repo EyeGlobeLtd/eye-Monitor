@@ -163,7 +163,7 @@ export const ServiceAccountsListPageUnconnected = ({
   const docsLink = (
     <a
       className="external-link"
-      href="https://grafana.com/docs/grafana/latest/administration/service-accounts/"
+      href=""
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -172,7 +172,7 @@ export const ServiceAccountsListPageUnconnected = ({
   );
   const subTitle = (
     <span>
-      Service accounts and their tokens can be used to authenticate against the Grafana API. Find out more in our{' '}
+      Service accounts and their tokens can be used to authenticate against the eyeMonitor API. Find out more in our{' '}
       {docsLink}
     </span>
   );
