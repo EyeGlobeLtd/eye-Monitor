@@ -1,22 +1,28 @@
 import { css } from '@emotion/css';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { DataSourceInstanceSettings, GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { config } from '@grafana/runtime';
 import { Button, Field, Icon, Input, Label, RadioButtonGroup, Stack, Tooltip, useStyles2 } from '@grafana/ui';
 import { DashboardPicker } from 'app/core/components/Select/DashboardPicker';
-import { useQueryParams } from 'app/core/hooks/useQueryParams';
+import { Trans } from 'app/core/internationalization';
+import { ContactPointSelector } from 'app/features/alerting/unified/components/notification-policies/ContactPointSelector';
 import { PromAlertingRuleState, PromRuleType } from 'app/types/unified-alerting-dto';
 
 import {
-  logInfo,
   LogMessages,
+  logInfo,
   trackRulesListViewChange,
   trackRulesSearchComponentInteraction,
   trackRulesSearchInputInteraction,
 } from '../../Analytics';
 import { useRulesFilter } from '../../hooks/useFilteredRules';
+import { useURLSearchParams } from '../../hooks/useURLSearchParams';
+import { useAlertingHomePageExtensions } from '../../plugins/useAlertingHomePageExtensions';
 import { RuleHealth } from '../../search/rulesSearchParser';
+import { AlertmanagerProvider } from '../../state/AlertmanagerContext';
+import { GRAFANA_RULES_SOURCE_NAME } from '../../utils/datasource';
 import { alertStateToReadable } from '../../utils/rules';
 import { HoverCard } from '../HoverCard';
 
@@ -68,7 +74,8 @@ const RuleStateOptions = Object.entries(PromAlertingRuleState).map(([key, value]
 
 const RulesFilter = ({ onFilterCleared = () => undefined }: RulesFilerProps) => {
   const styles = useStyles2(getStyles);
-  const [queryParams, setQueryParams] = useQueryParams();
+  const [queryParams, updateQueryParams] = useURLSearchParams();
+  const { pluginsFilterEnabled } = usePluginsFilterStatus();
   const { filterState, hasActiveFilters, searchQuery, setSearchQuery, updateFilters } = useRulesFilter();
 
   // This key is used to force a rerender on the inputs when the filters are cleared
@@ -77,7 +84,9 @@ const RulesFilter = ({ onFilterCleared = () => undefined }: RulesFilerProps) => 
   const queryStringKey = `queryString-${filterKey}`;
 
   const searchQueryRef = useRef<HTMLInputElement | null>(null);
-  const { handleSubmit, register, setValue } = useForm<{ searchQuery: string }>({ defaultValues: { searchQuery } });
+  const { handleSubmit, register, setValue } = useForm<{ searchQuery: string }>({
+    defaultValues: { searchQuery },
+  });
   const { ref, ...rest } = register('searchQuery');
 
   useEffect(() => {
@@ -133,11 +142,18 @@ const RulesFilter = ({ onFilterCleared = () => undefined }: RulesFilerProps) => 
   };
 
   const handleViewChange = (view: string) => {
-    setQueryParams({ view });
+    updateQueryParams({ view });
     trackRulesListViewChange({ view });
   };
 
+  const handleContactPointChange = (contactPoint: string) => {
+    updateFilters({ ...filterState, contactPoint });
+    trackRulesSearchComponentInteraction('contactPoint');
+  };
+
+  const canRenderContactPointSelector = config.featureToggles.alertingSimplifiedRouting ?? false;
   const searchIcon = <Icon name={'search'} />;
+
   return (
     <div className={styles.container}>
       <Stack direction="column" gap={1}>
@@ -146,7 +162,7 @@ const RulesFilter = ({ onFilterCleared = () => undefined }: RulesFilerProps) => 
             className={styles.dsPickerContainer}
             label={
               <Label htmlFor="data-source-picker">
-                <Stack gap={0.5}>
+                <Stack gap={0.5} alignItems="center">
                   <span>Search by data sources</span>
                   <Tooltip
                     content={
@@ -220,7 +236,46 @@ const RulesFilter = ({ onFilterCleared = () => undefined }: RulesFilerProps) => 
               onChange={handleRuleHealthChange}
             />
           </div>
+          {canRenderContactPointSelector && (
+            <AlertmanagerProvider accessType={'notification'} alertmanagerSourceName={GRAFANA_RULES_SOURCE_NAME}>
+              <Stack direction="column" gap={0}>
+                <Field
+                  label={
+                    <Label htmlFor="contactPointFilter">
+                      <Trans i18nKey="alerting.contactPointFilter.label">Contact point</Trans>
+                    </Label>
+                  }
+                >
+                  <ContactPointSelector
+                    selectedContactPointName={filterState.contactPoint}
+                    selectProps={{
+                      inputId: 'contactPointFilter',
+                      width: 40,
+                      onChange: (selectValue) => {
+                        handleContactPointChange(selectValue?.value?.name!);
+                      },
+                      isClearable: true,
+                    }}
+                  />
+                </Field>
+              </Stack>
+            </AlertmanagerProvider>
+          )}
+          {pluginsFilterEnabled && (
+            <div>
+              <Label>Plugin rules</Label>
+              <RadioButtonGroup<'hide'>
+                options={[
+                  { label: 'Show', value: undefined },
+                  { label: 'Hide', value: 'hide' },
+                ]}
+                value={filterState.plugins}
+                onChange={(value) => updateFilters({ ...filterState, plugins: value })}
+              />
+            </div>
+          )}
         </Stack>
+
         <Stack direction="column" gap={1}>
           <Stack direction="row" gap={1}>
             <form
@@ -234,7 +289,7 @@ const RulesFilter = ({ onFilterCleared = () => undefined }: RulesFilerProps) => 
               <Field
                 label={
                   <Label htmlFor="rulesSearchInput">
-                    <Stack gap={0.5}>
+                    <Stack gap={0.5} alignItems="center">
                       <span>Search</span>
                       <HoverCard content={<SearchQueryHelp />}>
                         <Icon name="info-circle" size="sm" tabIndex={0} title="Search help" />
@@ -262,7 +317,7 @@ const RulesFilter = ({ onFilterCleared = () => undefined }: RulesFilerProps) => 
               <Label>View as</Label>
               <RadioButtonGroup
                 options={ViewOptions}
-                value={String(queryParams['view'] ?? ViewOptions[0].value)}
+                value={queryParams.get('view') ?? ViewOptions[0].value}
                 onChange={handleViewChange}
               />
             </div>
@@ -319,6 +374,7 @@ function SearchQueryHelp() {
         <HelpRow title="Type" expr="type:alerting|recording" />
         <HelpRow title="Health" expr="health:ok|nodata|error" />
         <HelpRow title="Dashboard UID" expr="dashboard:eadde4c7-54e6-4964-85c0-484ab852fd04" />
+        <HelpRow title="Contact point" expr="contactPoint:slack" />
       </div>
     </div>
   );
@@ -347,5 +403,10 @@ const helpStyles = (theme: GrafanaTheme2) => ({
     textAlign: 'center',
   }),
 });
+
+function usePluginsFilterStatus() {
+  const { extensions } = useAlertingHomePageExtensions();
+  return { pluginsFilterEnabled: extensions.length > 0 };
+}
 
 export default RulesFilter;

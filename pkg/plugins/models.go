@@ -9,6 +9,8 @@ import (
 
 const (
 	TypeDashboard = "dashboard"
+
+	ActionAppAccess = "plugins.app:access"
 )
 
 var (
@@ -169,13 +171,11 @@ type Signature struct {
 
 type PluginMetaDTO struct {
 	JSONData
-
-	Signature SignatureStatus `json:"signature"`
-
-	Module  string `json:"module"`
-	BaseURL string `json:"baseUrl"`
-
-	Angular AngularMeta `json:"angular"`
+	Signature                 SignatureStatus `json:"signature"`
+	Module                    string          `json:"module"`
+	BaseURL                   string          `json:"baseUrl"`
+	Angular                   AngularMeta     `json:"angular"`
+	MultiValueFilterOperators bool            `json:"multiValueFilterOperators"`
 }
 
 type DataSourceDTO struct {
@@ -191,6 +191,7 @@ type DataSourceDTO struct {
 	Module     string         `json:"module,omitempty"`
 	JSONData   map[string]any `json:"jsonData"`
 	ReadOnly   bool           `json:"readOnly"`
+	APIVersion string         `json:"apiVersion,omitempty"`
 
 	BasicAuth       string `json:"basicAuth,omitempty"`
 	WithCredentials bool   `json:"withCredentials,omitempty"`
@@ -313,8 +314,6 @@ func (e Error) PublicMessage() string {
 	return "Plugin failed to load"
 }
 
-// Access-Control related definitions
-
 // RoleRegistration stores a role and its assignments to basic roles
 // (Viewer, Editor, Admin, Grafana Admin)
 type RoleRegistration struct {
@@ -332,6 +331,12 @@ type Role struct {
 type Permission struct {
 	Action string `json:"action"`
 	Scope  string `json:"scope"`
+}
+
+// ActionSet is the model for ActionSet in RBAC.
+type ActionSet struct {
+	Action  string   `json:"action"`
+	Actions []string `json:"actions"`
 }
 
 type QueryCachingConfig struct {

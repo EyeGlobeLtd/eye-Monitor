@@ -154,6 +154,11 @@ func CreateGrafDir(t *testing.T, opts ...GrafanaOpts) (string, string) {
 			  "js": ["public/build/runtime.XYZ.js"]
 			}
 		  },
+		  "swagger": {
+			"assets": {
+			  "js": ["public/build/runtime.XYZ.js"]
+			}
+		  },
 		  "dark": {
 			"assets": {
 			  "css": ["public/build/dark.css"]
@@ -384,6 +389,14 @@ func CreateGrafDir(t *testing.T, opts ...GrafanaOpts) (string, string) {
 			_, err = grafanaComSection.NewKey("api_url", o.GrafanaComAPIURL)
 			require.NoError(t, err)
 		}
+		if o.UnifiedStorageConfig != nil {
+			for k, v := range o.UnifiedStorageConfig {
+				section, err := getOrCreateSection(fmt.Sprintf("unified_storage.%s", k))
+				require.NoError(t, err)
+				_, err = section.NewKey("dualWriterMode", fmt.Sprintf("%d", v.DualWriterMode))
+				require.NoError(t, err)
+			}
+		}
 	}
 	logSection, err := getOrCreateSection("database")
 	require.NoError(t, err)
@@ -431,6 +444,7 @@ type GrafanaOpts struct {
 	QueryRetries                          int64
 	APIServerStorageType                  string
 	GrafanaComAPIURL                      string
+	UnifiedStorageConfig                  map[string]setting.UnifiedStorageConfig
 }
 
 func CreateUser(t *testing.T, store db.DB, cfg *setting.Cfg, cmd user.CreateUserCommand) *user.User {
@@ -440,7 +454,7 @@ func CreateUser(t *testing.T, store db.DB, cfg *setting.Cfg, cmd user.CreateUser
 	cfg.AutoAssignOrgId = 1
 	cmd.OrgID = 1
 
-	quotaService := quotaimpl.ProvideService(store, cfg)
+	quotaService := quotaimpl.ProvideService(db.FakeReplDBFromDB(store), cfg)
 	orgService, err := orgimpl.ProvideService(store, cfg, quotaService)
 	require.NoError(t, err)
 	usrSvc, err := userimpl.ProvideService(

@@ -1,9 +1,11 @@
 import { AppEvents } from '@grafana/data';
-import { SceneGridLayout, SceneQueryRunner, VizPanel } from '@grafana/scenes';
+import { SceneGridLayout, SceneGridRow, SceneQueryRunner, VizPanel } from '@grafana/scenes';
 import appEvents from 'app/core/app_events';
+import { KioskMode } from 'app/types';
 
 import { DashboardGridItem } from './DashboardGridItem';
 import { DashboardScene } from './DashboardScene';
+import { RowRepeaterBehavior } from './RowRepeaterBehavior';
 import { DashboardRepeatsProcessedEvent } from './types';
 
 describe('DashboardSceneUrlSync', () => {
@@ -39,6 +41,40 @@ describe('DashboardSceneUrlSync', () => {
       (scene.state.body as SceneGridLayout).setState({ UNSAFE_fitPanels: true });
       expect(scene.urlSync?.getUrlState().autofitpanels).toBe('true');
     });
+
+    it('Should set kiosk mode when url has kiosk', () => {
+      const scene = buildTestScene();
+
+      scene.urlSync?.updateFromUrl({ kiosk: 'invalid' });
+      expect(scene.state.kioskMode).toBe(undefined);
+      scene.urlSync?.updateFromUrl({ kiosk: '' });
+      expect(scene.state.kioskMode).toBe(KioskMode.Full);
+      scene.urlSync?.updateFromUrl({ kiosk: 'tv' });
+      expect(scene.state.kioskMode).toBe(KioskMode.TV);
+      scene.urlSync?.updateFromUrl({ kiosk: 'true' });
+      expect(scene.state.kioskMode).toBe(KioskMode.Full);
+    });
+
+    it('Should get the kiosk mode from the scene state', () => {
+      const scene = buildTestScene();
+
+      expect(scene.urlSync?.getUrlState().kiosk).toBe(undefined);
+      scene.setState({ kioskMode: KioskMode.TV });
+      expect(scene.urlSync?.getUrlState().kiosk).toBe(KioskMode.TV);
+      scene.setState({ kioskMode: KioskMode.Full });
+      expect(scene.urlSync?.getUrlState().kiosk).toBe('');
+    });
+  });
+
+  describe('entering edit mode', () => {
+    it('it should be possible to go from the view panel view to the edit view when the dashboard is not in edit mdoe', () => {
+      const scene = buildTestScene();
+      scene.setState({ isEditing: false });
+      scene.urlSync?.updateFromUrl({ viewPanel: 'panel-1' });
+      expect(scene.state.viewPanelScene).toBeDefined();
+      scene.urlSync?.updateFromUrl({ editPanel: 'panel-1' });
+      expect(scene.state.editPanel).toBeDefined();
+    });
   });
 
   describe('Given a viewPanelKey with clone that is not found', () => {
@@ -72,6 +108,35 @@ describe('DashboardSceneUrlSync', () => {
     // Verify it subscribes to DashboardRepeatsProcessedEvent
     scene.publishEvent(new DashboardRepeatsProcessedEvent({ source: scene }));
     expect(scene.state.viewPanelScene?.getUrlKey()).toBe('panel-1-clone-1');
+  });
+
+  it('should subscribe and update view panel if panel is in a repeated row', () => {
+    const scene = buildTestScene();
+
+    // fake adding row panel
+    const layout = scene.state.body as SceneGridLayout;
+    layout.setState({
+      children: [
+        new SceneGridRow({
+          $behaviors: [new RowRepeaterBehavior({ variableName: 'test' })],
+          children: [
+            new VizPanel({
+              title: 'Panel A',
+              key: 'panel-1',
+              pluginId: 'table',
+            }),
+          ],
+        }),
+      ],
+    });
+
+    scene.urlSync?.updateFromUrl({ viewPanel: 'panel-1' });
+
+    expect(scene.state.viewPanelScene?.getUrlKey()).toBeUndefined();
+
+    // Verify it subscribes to DashboardRepeatsProcessedEvent
+    scene.publishEvent(new DashboardRepeatsProcessedEvent({ source: scene }));
+    expect(scene.state.viewPanelScene?.getUrlKey()).toBe('panel-1');
   });
 });
 
