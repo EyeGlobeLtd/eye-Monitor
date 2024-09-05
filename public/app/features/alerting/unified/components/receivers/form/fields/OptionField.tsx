@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import { isEmpty } from 'lodash';
-import React, { FC, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import { Controller, DeepMap, FieldError, useFormContext } from 'react-hook-form';
 
 import { GrafanaTheme2 } from '@grafana/data';
@@ -35,6 +35,7 @@ export const OptionField: FC<Props> = ({
   customValidator,
 }) => {
   const optionPath = `${pathPrefix}${pathSuffix}`;
+  const isSecure = pathSuffix === 'secureSettings.';
 
   if (option.element === 'subform') {
     return (
@@ -75,12 +76,13 @@ export const OptionField: FC<Props> = ({
         readOnly={readOnly}
         pathIndex={pathPrefix}
         customValidator={customValidator}
+        isSecure={isSecure}
       />
     </Field>
   );
 };
 
-const OptionInput: FC<Props & { id: string; pathIndex?: string }> = ({
+const OptionInput: FC<Props & { id: string; pathIndex?: string; isSecure?: boolean }> = ({
   option,
   invalid,
   id,
@@ -88,10 +90,18 @@ const OptionInput: FC<Props & { id: string; pathIndex?: string }> = ({
   pathIndex = '',
   readOnly = false,
   customValidator,
+  isSecure,
 }) => {
   const styles = useStyles2(getStyles);
   const { control, register, unregister, getValues, setValue } = useFormContext();
   const name = `${pathPrefix}${option.propertyName}`;
+
+  useEffect(() => {
+    // Remove the value of secure fields so it doesn't show the incorrect value when clearing the field
+    if (isSecure) {
+      setValue(name, null);
+    }
+  }, [isSecure, name, setValue]);
 
   // workaround for https://github.com/react-hook-form/react-hook-form/issues/4993#issuecomment-829012506
   useEffect(
@@ -161,7 +171,7 @@ const OptionInput: FC<Props & { id: string; pathIndex?: string }> = ({
           )}
           control={control}
           name={name}
-          defaultValue={option.defaultValue}
+          defaultValue={option.defaultValue?.value}
           rules={{
             validate: {
               customValidator: (v) => (customValidator ? customValidator(v) : true),

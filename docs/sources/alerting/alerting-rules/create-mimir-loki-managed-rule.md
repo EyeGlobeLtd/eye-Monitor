@@ -29,6 +29,16 @@ refs:
       destination: /docs/grafana/<GRAFANA_VERSION>/alerting/fundamentals/alert-rules/annotation-label/
     - pattern: /docs/grafana-cloud/
       destination: /docs/grafana-cloud/alerting-and-irm/alerting/fundamentals/alert-rules/annotation-label/
+  alert-list:
+    - pattern: /docs/grafana/
+      destination: /docs/grafana/<GRAFANA_VERSION>/panels-visualizations/visualizations/alert-list/
+    - pattern: /docs/grafana-cloud/
+      destination: /docs/grafana-cloud/visualizations/panels-visualizations/visualizations/alert-list/
+  time-series:
+    - pattern: /docs/grafana/
+      destination: /docs/grafana/<GRAFANA_VERSION>/panels-visualizations/visualizations/time-series/
+    - pattern: /docs/grafana-cloud/
+      destination: /docs/grafana-cloud/visualizations/panels-visualizations/visualizations/time-series/
 ---
 
 # Configure data source-managed alert rules
@@ -134,6 +144,8 @@ Annotations add metadata to provide more information on the alert in your alert 
 
    Links alerts to panels in a dashboard.
 
-   {{< docs/play title="visualizations with linked alerts in Grafana" url="https://play.grafana.org/d/000000074/" >}}
+   {{% admonition type="note" %}}
+   At the moment, alert rules are only supported in [time series](ref:time-series) and [alert list](ref:alert-list) visualizations.
+   {{% /admonition %}}
 
 1. Click **Save rule**.

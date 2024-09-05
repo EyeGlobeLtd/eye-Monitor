@@ -7,12 +7,12 @@ WIRE_TAGS = "oss"
 -include local/Makefile
 include .bingo/Variables.mk
 
-
 GO = go
-GO_VERSION = 1.22.3
-GO_FILES ?= ./pkg/... ./pkg/apiserver/... ./pkg/apimachinery/... ./pkg/promlib/...
+GO_VERSION = 1.23.0
+GO_LINT_FILES ?= $(shell ./scripts/go-workspace/golangci-lint-includes.sh)
+GO_TEST_FILES ?= $(shell ./scripts/go-workspace/test-includes.sh)
 SH_FILES ?= $(shell find ./scripts -name *.sh)
-GO_RACE  := $(shell [ -n "$(GO_BUILD_DEV)$(GO_RACE)" -o -e ".go-race-enabled-locally" ] && echo 1 )
+GO_RACE  := $(shell [ -n "$(GO_RACE)" -o -e ".go-race-enabled-locally" ] && echo 1 )
 GO_RACE_FLAG := $(if $(GO_RACE),-race)
 GO_BUILD_FLAGS += $(if $(GO_BUILD_DEV),-dev)
 GO_BUILD_FLAGS += $(if $(GO_BUILD_TAGS),-build-tags=$(GO_BUILD_TAGS))
@@ -61,6 +61,7 @@ swagger-oss-gen: $(SWAGGER) ## Generate API Swagger specification
 	rm -f $(SPEC_TARGET)
 	SWAGGER_GENERATE_EXTENSION=false $(SWAGGER) generate spec -q -m -w pkg/server -o $(SPEC_TARGET) \
 	-x "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions" \
+	-x "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options" \
 	-x "github.com/prometheus/alertmanager" \
 	-i pkg/api/swagger_tags.json \
 	--exclude-tag=alpha \
@@ -78,6 +79,7 @@ swagger-enterprise-gen: $(SWAGGER) ## Generate API Swagger specification
 	rm -f $(ENTERPRISE_SPEC_TARGET)
 	SWAGGER_GENERATE_EXTENSION=false $(SWAGGER) generate spec -q -m -w pkg/server -o $(ENTERPRISE_SPEC_TARGET) \
 	-x "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions" \
+	-x "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options" \
 	-x "github.com/prometheus/alertmanager" \
 	-i pkg/api/swagger_tags.json \
 	--exclude-tag=alpha \
@@ -167,8 +169,13 @@ fix-cue: $(CUE)
 gen-jsonnet:
 	go generate ./devenv/jsonnet
 
+.PHONY: update-workspace
+update-workspace:
+	@echo "updating workspace"
+	bash scripts/go-workspace/update-workspace.sh
+
 .PHONY: build-go
-build-go: gen-go ## Build all Go binaries.
+build-go: gen-go update-workspace ## Build all Go binaries.
 	@echo "build go files"
 	$(GO) run build.go $(GO_BUILD_FLAGS) build
 
@@ -209,13 +216,13 @@ build-plugin-go: ## Build decoupled plugins
 build: build-go build-js ## Build backend and frontend.
 
 .PHONY: run
-run: $(BRA) ## Build and run web server on filesystem changes.
+run: $(BRA) ## Build and run web server on filesystem changes. See /.bra.toml for configuration.
 	$(BRA) run
 
 .PHONY: run-go
 run-go: ## Build and run web server immediately.
 	$(GO) run -race $(if $(GO_BUILD_TAGS),-build-tags=$(GO_BUILD_TAGS)) \
-		./pkg/cmd/grafana -- server -packaging=dev cfg:app_mode=development
+		./pkg/cmd/grafana -- server -profile -profile-addr=127.0.0.1 -profile-port=6000 -packaging=dev cfg:app_mode=development
 
 .PHONY: run-frontend
 run-frontend: deps-js ## Fetch js dependencies and watch frontend for rebuild
@@ -229,8 +236,16 @@ test-go: test-go-unit test-go-integration
 .PHONY: test-go-unit
 test-go-unit: ## Run unit tests for backend with flags.
 	@echo "test backend unit tests"
-	go list -f '{{.Dir}}/...' -m | xargs \
+	printf '$(GO_TEST_FILES)' | xargs \
 	$(GO) test $(GO_RACE_FLAG) -short -covermode=atomic -timeout=30m
+
+.PHONY: test-go-unit-pretty
+test-go-unit-pretty: check-tparse
+	@if [ -z "$(FILES)" ]; then \
+		echo "Notice: FILES variable is not set. Try \"make test-go-unit-pretty FILES=./pkg/services/mysvc\""; \
+		exit 1; \
+	fi
+	$(GO) test $(GO_RACE_FLAG) -timeout=10s $(FILES) -json | tparse -all
 
 .PHONY: test-go-integration
 test-go-integration: ## Run integration tests for backend with flags.
@@ -283,10 +298,10 @@ golangci-lint: $(GOLANGCI_LINT)
 	@echo "lint via golangci-lint"
 	$(GOLANGCI_LINT) run \
 		--config .golangci.toml \
-		$(GO_FILES)
+		$(GO_LINT_FILES)
 
 .PHONY: lint-go
-lint-go: golangci-lint ## Run all code checks for backend. You can use GO_FILES to specify exact files to check
+lint-go: golangci-lint ## Run all code checks for backend. You can use GO_LINT_FILES to specify exact files to check
 
 # with disabled SC1071 we are ignored some TCL,Expect `/usr/bin/env expect` scripts
 .PHONY: shellcheck
@@ -375,10 +390,10 @@ devenv-mysql:
 protobuf: ## Compile protobuf definitions
 	bash scripts/protobuf-check.sh
 	go install google.golang.org/protobuf/cmd/protoc-gen-go
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.4.0
 	buf generate pkg/plugins/backendplugin/pluginextensionv2 --template pkg/plugins/backendplugin/pluginextensionv2/buf.gen.yaml
 	buf generate pkg/plugins/backendplugin/secretsmanagerplugin --template pkg/plugins/backendplugin/secretsmanagerplugin/buf.gen.yaml
-	buf generate pkg/services/store/entity --template pkg/services/store/entity/buf.gen.yaml
+	buf generate pkg/storage/unified/resource --template pkg/storage/unified/resource/buf.gen.yaml
 
 .PHONY: clean
 clean: ## Clean up intermediate build artifacts.
@@ -423,6 +438,12 @@ go-race-is-enabled:
 .PHONY: enable-go-race
 enable-go-race:
 	@touch .go-race-enabled-locally
+
+check-tparse:
+	@command -v tparse >/dev/null 2>&1 || { \
+		echo >&2 "Error: tparse is not installed. Refer to https://github.com/mfridman/tparse"; \
+		exit 1; \
+	}
 
 .PHONY: help
 help: ## Display this help.

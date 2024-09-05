@@ -17,6 +17,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 
 	query "github.com/grafana/grafana/pkg/apis/query/v0alpha1"
@@ -47,7 +48,7 @@ func newQueryREST(builder *QueryAPIBuilder) *queryREST {
 }
 
 func (r *queryREST) New() runtime.Object {
-	// This is added as the "ResponseType" regarless what ProducesObject() says :)
+	// This is added as the "ResponseType" regardless what ProducesObject() says :)
 	return &query.QueryDataResponse{}
 }
 
@@ -77,8 +78,8 @@ func (r *queryREST) NewConnectOptions() (runtime.Object, bool, string) {
 	return nil, false, "" // true means you can use the trailing path as a variable
 }
 
-func (r *queryREST) Connect(ctx context.Context, name string, opts runtime.Object, incomingResponder rest.Responder) (http.Handler, error) {
-	// See: /pkg/apiserver/builder/helper.go#L34
+func (r *queryREST) Connect(connectCtx context.Context, name string, _ runtime.Object, incomingResponder rest.Responder) (http.Handler, error) {
+	// See: /pkg/services/apiserver/builder/helper.go#L34
 	// The name is set with a rewriter hack
 	if name != "name" {
 		return nil, errorsK8s.NewNotFound(schema.GroupResource{}, name)
@@ -88,6 +89,7 @@ func (r *queryREST) Connect(ctx context.Context, name string, opts runtime.Objec
 	return http.HandlerFunc(func(w http.ResponseWriter, httpreq *http.Request) {
 		ctx, span := b.tracer.Start(httpreq.Context(), "QueryService.Query")
 		defer span.End()
+		ctx = request.WithNamespace(ctx, request.NamespaceValue(connectCtx))
 
 		responder := newResponderWrapper(incomingResponder,
 			func(statusCode int, obj runtime.Object) {
@@ -116,7 +118,6 @@ func (r *queryREST) Connect(ctx context.Context, name string, opts runtime.Objec
 			responder.Error(err)
 			return
 		}
-
 		// Parses the request and splits it into multiple sub queries (if necessary)
 		req, err := b.parser.parseRequest(ctx, raw)
 		if err != nil {
@@ -131,6 +132,10 @@ func (r *queryREST) Connect(ctx context.Context, name string, opts runtime.Objec
 			}
 			responder.Error(err)
 			return
+		}
+
+		for i := range req.Requests {
+			req.Requests[i].Headers = ExtractKnownHeaders(httpreq.Header)
 		}
 
 		// Actually run the query
@@ -149,7 +154,7 @@ func (r *queryREST) Connect(ctx context.Context, name string, opts runtime.Objec
 func (b *QueryAPIBuilder) execute(ctx context.Context, req parsedRequestInfo) (qdr *backend.QueryDataResponse, err error) {
 	switch len(req.Requests) {
 	case 0:
-		break // nothing to do
+		qdr = &backend.QueryDataResponse{}
 	case 1:
 		qdr, err = b.handleQuerySingleDatasource(ctx, req.Requests[0])
 	default:
@@ -191,11 +196,14 @@ func (b *QueryAPIBuilder) handleQuerySingleDatasource(ctx context.Context, req d
 		return &backend.QueryDataResponse{}, nil
 	}
 
-	// Add user headers... here or in client.QueryData
-	client, err := b.client.GetDataSourceClient(ctx, v0alpha1.DataSourceRef{
-		Type: req.PluginId,
-		UID:  req.UID,
-	})
+	client, err := b.client.GetDataSourceClient(
+		ctx,
+		v0alpha1.DataSourceRef{
+			Type: req.PluginId,
+			UID:  req.UID,
+		},
+		req.Headers,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +266,7 @@ func (b *QueryAPIBuilder) executeConcurrentQueries(ctx context.Context, requests
 			if theErr, ok := r.(error); ok {
 				err = theErr
 			} else if theErrString, ok := r.(string); ok {
-				err = fmt.Errorf(theErrString)
+				err = errors.New(theErrString)
 			} else {
 				err = fmt.Errorf("unexpected error - %s", b.userFacingDefaultError)
 			}

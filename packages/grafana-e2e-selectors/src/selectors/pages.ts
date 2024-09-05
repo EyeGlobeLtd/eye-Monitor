@@ -57,6 +57,7 @@ export const Pages = {
       navV2: 'data-testid Dashboard navigation',
       publicDashboardTag: 'data-testid public dashboard tag',
       shareButton: 'data-testid share-button',
+      settingsButton: 'data-testid settings-button',
       scrollContainer: 'data-testid Dashboard canvas scroll container',
       newShareButton: {
         container: 'data-testid new share button',
@@ -65,6 +66,16 @@ export const Pages = {
         menu: {
           container: 'data-testid new share button menu',
           shareInternally: 'data-testid new share button share internally',
+          shareExternally: 'data-testid new share button share externally',
+          shareSnapshot: 'data-testid new share button share snapshot',
+        },
+      },
+      NewExportButton: {
+        container: 'data-testid new export button',
+        arrowMenu: 'data-testid new export button arrow menu',
+        Menu: {
+          container: 'data-testid new export button menu',
+          exportAsJson: 'data-testid new export button export as json',
         },
       },
       playlistControls: {
@@ -102,7 +113,7 @@ export const Pages = {
          * @deprecated use components.TimeZonePicker.containerV2 from Grafana 8.3 instead
          */
         timezone: 'Time zone picker select container',
-        title: 'Tab General',
+        title: 'General',
       },
       Annotations: {
         List: {
@@ -229,6 +240,9 @@ export const Pages = {
      */
     dashboards: (title: string) => `Dashboard search item ${title}`,
   },
+  RecentlyDeleted: {
+    url: '/dashboard/recently-deleted',
+  },
   SaveDashboardAsModal: {
     newName: 'Save dashboard title field',
     save: 'Save dashboard button',
@@ -244,7 +258,6 @@ export const Pages = {
   },
   ShareDashboardModal: {
     PublicDashboard: {
-      Tab: 'Tab Public dashboard',
       WillBePublicCheckbox: 'data-testid public dashboard will be public checkbox',
       LimitedDSCheckbox: 'data-testid public dashboard limited datasources checkbox',
       CostIncreaseCheckbox: 'data-testid public dashboard cost may increase checkbox',
@@ -269,15 +282,31 @@ export const Pages = {
         ReshareLink: 'data-testid public dashboard reshare link button',
       },
     },
-    PublicDashboardScene: {
-      Tab: 'Tab Public Dashboard',
-    },
     SnapshotScene: {
       url: (key: string) => `/dashboard/snapshot/${key}`,
-      Tab: 'Tab Snapshot',
       PublishSnapshot: 'data-testid publish snapshot button',
       CopyUrlButton: 'data-testid snapshot copy url button',
       CopyUrlInput: 'data-testid snapshot copy url input',
+    },
+  },
+  ShareDashboardDrawer: {
+    ShareExternally: {
+      container: 'data-testid share externally drawer container',
+      copyUrlButton: 'data-testid share externally copy url button',
+      shareTypeSelect: 'data-testid share externally share type select',
+    },
+    ShareSnapshot: {
+      container: 'data-testid share snapshot drawer container',
+    },
+  },
+  ExportDashboardDrawer: {
+    ExportAsJson: {
+      container: 'data-testid export as Json drawer container',
+      codeEditor: 'data-testid export as Json code editor',
+      exportExternallyToggle: 'data-testid export externally toggle type select',
+      saveToFileButton: 'data-testid save to file button',
+      copyToClipboardButton: 'data-testid copy to clipboard button',
+      cancelButton: 'data-testid cancel button',
     },
   },
   PublicDashboard: {
@@ -349,6 +378,10 @@ export const Pages = {
     url: '/?search=openn',
     FolderView: {
       url: '/?search=open&layout=folders',
+    },
+    table: {
+      body: 'data-testid search-table',
+      row: (name: string) => `data-testid search row ${name}`,
     },
   },
   PublicDashboards: {
