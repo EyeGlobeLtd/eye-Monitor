@@ -11,14 +11,16 @@
     <mj-include path="./partials/layout/head.mjml" />
   </mj-head>
   <mj-body>
+    <!--
     <mj-section>
       <mj-include path="./partials/layout/header.mjml" />
     </mj-section>
+    -->
     <mj-section css-class="background">
       <mj-column>
         <mj-text>
           <h2>You have been added to {{ .OrgName }}</h2>
-          <strong>{{ .InvitedBy }}</strong> has added you to the <strong>{{ .OrgName }}</strong> organization in Grafana.
+          <strong>{{ .InvitedBy }}</strong> has added you to the <strong>{{ .OrgName }}</strong> organization in eyeMonitor.
         </mj-text>
         <mj-text>
           Once logged in, <strong>{{ .OrgName }}</strong> will be available to switch to in the user interface.
@@ -27,7 +29,7 @@
           Log in now by clicking the link below:
         </mj-text>
         <mj-button href="{{ .AppUrl }}">
-          Login to Grafana
+          Login to eyeMonitor
         </mj-button>
         <mj-text>
           You can also copy and paste this link into your browser directly:

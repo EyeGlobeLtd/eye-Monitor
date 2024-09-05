@@ -19,7 +19,7 @@ export function NewsContainer({ className }: NewsContainerProps) {
 
   return (
     <>
-      <ToolbarButton className={className} onClick={onToggleShowNewsDrawer} iconOnly icon="rss" aria-label="News" />
+      <ToolbarButton className={styles.hidden} onClick={onToggleShowNewsDrawer} iconOnly icon="rss" aria-label="News" />
       {showNewsDrawer && (
         <Drawer
           title={
@@ -58,7 +58,7 @@ export function NewsContainer({ className }: NewsContainerProps) {
 const getStyles = (theme: GrafanaTheme2) => {
   return {
     title: css({
-      display: `flex`,
+      display: `none`,
       alignItems: `center`,
       justifyContent: `center`,
       gap: theme.spacing(2),
@@ -79,6 +79,9 @@ const getStyles = (theme: GrafanaTheme2) => {
       position: 'absolute',
       right: theme.spacing(1),
       top: theme.spacing(2),
+    }),
+    hidden: css({
+      display: `none`,
     }),
   };
 };

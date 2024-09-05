@@ -41,7 +41,7 @@ export const SearchField = ({ value, onSearch }: Props) => {
           onSearch(e.currentTarget.value);
         }
       }}
-      placeholder="Search Grafana plugins"
+      placeholder="Search eyeMonitor plugins or extensions"
       onChange={(value) => {
         setQuery(value);
       }}

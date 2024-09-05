@@ -15,7 +15,7 @@ export const WelcomeBanner = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Welcome to Grafana</h1>
+      <h1 className={styles.title}>Welcome to eyeMonitor</h1>
       <div className={styles.help}>
         <h3 className={styles.helpText}>Need help?</h3>
         <div className={styles.helpLinks}>
@@ -74,7 +74,7 @@ const getStyles = (theme: GrafanaTheme2) => {
       }
     `,
     help: css`
-      display: flex;
+      display: none;
       align-items: baseline;
     `,
     helpText: css`

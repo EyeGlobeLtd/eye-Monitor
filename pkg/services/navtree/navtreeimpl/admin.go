@@ -88,7 +88,7 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 		pluginsNodeLinks = append(pluginsNodeLinks, &navtree.NavLink{
 			Text:     "Plugins",
 			Id:       "plugins",
-			SubTitle: "Extend the Grafana experience with plugins",
+			SubTitle: "Extend the eyeMonitor experience with plugins",
 			Icon:     "plug",
 			Url:      s.cfg.AppSubURL + "/plugins",
 		})
@@ -135,7 +135,7 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 		accessNodeLinks = append(accessNodeLinks, &navtree.NavLink{
 			Text:     "Service accounts",
 			Id:       "serviceaccounts",
-			SubTitle: "Use service accounts to run automated workloads in Grafana",
+			SubTitle: "Use service accounts to run automated workloads in eyeMonitor",
 			Icon:     "gf-service-account",
 			Url:      s.cfg.AppSubURL + "/org/serviceaccounts",
 		})
@@ -148,7 +148,7 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 		accessNodeLinks = append(accessNodeLinks, &navtree.NavLink{
 			Text:     "API keys",
 			Id:       "apikeys",
-			SubTitle: "Manage and create API keys that are used to interact with Grafana HTTP APIs",
+			SubTitle: "Manage and create API keys that are used to interact with eyeMonitor HTTP APIs",
 			Icon:     "key-skeleton-alt",
 			Url:      s.cfg.AppSubURL + "/org/apikeys",
 		})
