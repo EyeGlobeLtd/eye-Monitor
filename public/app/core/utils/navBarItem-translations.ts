@@ -283,7 +283,7 @@ export function getNavSubTitle(navId: string | undefined) {
         'Manage server-wide settings and access to resources such as organizations, users, and licenses'
       );
     case 'cfg/general':
-      return t('nav.config-general.subtitle', 'Manage default preferences and settings across Grafana');
+      return t('nav.config-general.subtitle', 'Manage default preferences and settings across eyeMonitor');
     case 'cfg/plugins':
       return t('nav.config-plugins.subtitle', 'Install plugins and define the relationships between data');
     case 'cfg/access':

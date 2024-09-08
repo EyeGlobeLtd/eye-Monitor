@@ -1484,7 +1484,7 @@
       "title": "Users and access"
     },
     "config-general": {
-      "subtitle": "Manage default preferences and settings across Grafana",
+      "subtitle": "Manage default preferences and settings across eyeMonitor",
       "title": "General"
     },
     "config-plugins": {
