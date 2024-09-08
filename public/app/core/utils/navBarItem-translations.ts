@@ -255,7 +255,7 @@ export function getNavSubTitle(navId: string | undefined) {
     case 'teams':
       return t('nav.teams.subtitle', 'Groups of users that have common dashboard and permission needs');
     case 'plugins':
-      return t('nav.plugins.subtitle', 'Extend the Grafana experience with plugins');
+      return t('nav.plugins.subtitle', 'Extend the eyeMonitor experience with plugins');
     case 'org-settings':
       return t('nav.org-settings.subtitle', 'Manage preferences across an organization');
     case 'apikeys':

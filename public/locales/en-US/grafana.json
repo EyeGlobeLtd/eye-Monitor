@@ -1621,7 +1621,7 @@
       "title": "Playlists"
     },
     "plugins": {
-      "subtitle": "Extend the Grafana experience with plugins",
+      "subtitle": "Extend the eyeMonitor experience with plugins",
       "title": "Plugins"
     },
     "private-data-source-connections": {
