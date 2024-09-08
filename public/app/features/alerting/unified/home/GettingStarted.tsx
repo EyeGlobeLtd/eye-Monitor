@@ -16,7 +16,7 @@ export default function GettingStarted() {
           <Text element="h3">How it works</Text>
           <ul className={styles.list}>
             <li>
-              Grafana alerting periodically queries data sources and evaluates the condition defined in the alert rule
+              eyeMonitor alerting periodically queries data sources and evaluates the condition defined in the alert rule
             </li>
             <li>If the condition is breached, an alert instance fires</li>
             <li>Firing instances are routed to notification policies based on matching labels</li>
@@ -52,12 +52,12 @@ export default function GettingStarted() {
           <p>
             For a hands-on introduction, refer to our{' '}
             <TextLink
-              href="https://grafana.com/tutorials/alerting-get-started/"
+              href="https://monitoring.konza.go.ke/tutorials/alerting-get-started/"
               icon="angle-right"
               inline={true}
               external
             >
-              tutorial to get started with Grafana Alerting
+              tutorial to get started with eyeMonitor Alerting
             </TextLink>
           </p>
         </Stack>
