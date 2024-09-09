@@ -70,7 +70,7 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 
 	generalNode := &navtree.NavLink{
 		Text:     "General",
-		SubTitle: "Manage default preferences and settings across Grafana",
+		SubTitle: "Manage default preferences and settings across eyeMonitor",
 		Id:       navtree.NavIDCfgGeneral,
 		Url:      "/admin/general",
 		Icon:     "shield",

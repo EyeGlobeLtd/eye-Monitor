@@ -312,7 +312,7 @@ export const navIndex: NavIndex = {
       {
         id: 'plugins',
         text: 'Plugins',
-        subTitle: 'Extend the Grafana experience with plugins',
+        subTitle: 'Extend the eyeMonitor experience with plugins',
         icon: 'plug',
         url: '/plugins',
       },

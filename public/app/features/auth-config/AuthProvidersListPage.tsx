@@ -75,7 +75,7 @@ export const AuthConfigPageUnconnected = ({
           Manage your auth settings and configure single sign-on. Find out more in our{' '}
           <TextLink
             external={true}
-            href="https://grafana.com/docs/grafana/next/setup-grafana/configure-security/configure-authentication"
+            href="https://monitoring.konza.go.ke/configure-security/configure-authentication"
           >
             documentation
           </TextLink>

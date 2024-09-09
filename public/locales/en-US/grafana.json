@@ -1484,7 +1484,7 @@
       "title": "Users and access"
     },
     "config-general": {
-      "subtitle": "Manage default preferences and settings across Grafana",
+      "subtitle": "Manage default preferences and settings across eyeMonitor",
       "title": "General"
     },
     "config-plugins": {
@@ -1621,7 +1621,7 @@
       "title": "Playlists"
     },
     "plugins": {
-      "subtitle": "Extend the Grafana experience with plugins",
+      "subtitle": "Extend the eyeMonitor experience with plugins",
       "title": "Plugins"
     },
     "private-data-source-connections": {
