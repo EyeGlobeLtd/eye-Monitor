@@ -133,6 +133,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
   }),
   list: css({
     listStyle: 'none',
+    display: 'none',
   }),
   listItem: css({
     display: 'inline-block',
