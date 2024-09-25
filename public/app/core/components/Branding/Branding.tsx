@@ -61,7 +61,7 @@ export class Branding {
   static LoginBoxBackground = LoginBoxBackground;
   static AppTitle = 'eyeMonitor';
   static LoginTitle = 'Welcome to eyeMonitor';
-  static HideEdition = false;
+  static HideEdition = true;
   static GetLoginSubTitle = (): null | string => {
     return null;
   };
